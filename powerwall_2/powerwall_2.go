@@ -14,10 +14,10 @@ type Powerwall2 struct {
 	*accessory.A
 
 	battery *service.BatteryService
-	client  powerwall.Client
+	client  *powerwall.Client
 }
 
-func NewPowerwall2(client powerwall.Client) *Powerwall2 {
+func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	// TODO: get powerwall info from the from the /api/powerwalls endpoint
 	info := accessory.Info{
 		Name:         "Powerwall 2",
@@ -68,7 +68,7 @@ func (pw *Powerwall2) getChargingState() int {
 	if charge == 100 {
 		// battery is fully charged
 		return characteristic.ChargingStateNotChargeable
-	} else if chargingStatus.Battery.InstantPower < 0 {
+	} else if (*chargingStatus)["battery"].InstantPower < 0 {
 		// battery is charging
 		return characteristic.ChargingStateCharging
 	}

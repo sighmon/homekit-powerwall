@@ -62,7 +62,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("The gateway's ID number is: %s\nIt is running version: %s\n", result.Din, result.Version)
-	powerwall2 := powerwall_2.NewPowerwall(client)
+	powerwall2 := powerwall_2.NewPowerwall2(client)
 	// gridSensor := grid.NewSensor(ip)
 
 	// Store the data in the "./db" directory.
