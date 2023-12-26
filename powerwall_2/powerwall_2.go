@@ -12,7 +12,6 @@ import (
 
 type Powerwall2 struct {
 	*accessory.A
-
 	battery *service.BatteryService
 	client  *powerwall.Client
 }
@@ -21,9 +20,9 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	// TODO: get powerwall info from the from the /api/powerwalls endpoint
 	info := accessory.Info{
 		Name:         "Powerwall 2",
-		Model:        "2012170-00-A",
+		Model:        "3012170-05-E",
 		Manufacturer: "Tesla",
-		SerialNumber: "TG118252000S5W/TG118252000S65",
+		SerialNumber: "TG123000000ABC",
 		Firmware:     "1.0.0",
 	}
 

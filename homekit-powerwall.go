@@ -14,6 +14,7 @@ import (
 	"github.com/brutella/hap/accessory"
 	"github.com/foogod/go-powerwall"
 
+	"github.com/sighmon/homekit-powerwall/grid"
 	"github.com/sighmon/homekit-powerwall/powerwall_2"
 	"github.com/sighmon/homekit-powerwall/promexporter"
 )
@@ -50,8 +51,13 @@ func main() {
 	}
 
 	// Setup the HomeKit accessory
-	// ip := net.ParseIP(powerwallIP)
-	bridgeInfo := accessory.Info{Name: "Tesla"}
+	bridgeInfo := accessory.Info{
+		Name:         "Tesla",
+		Model:        "Bridge",
+		Manufacturer: "Tesla",
+		SerialNumber: "TB1",
+		Firmware:     "1.0.0",
+	}
 	bridge := accessory.NewBridge(bridgeInfo)
 	client := powerwall.NewClient(powerwallIP, username, password)
 	interval, err := time.ParseDuration("10s")
@@ -63,13 +69,13 @@ func main() {
 	}
 	fmt.Printf("The gateway's ID number is: %s\nIt is running version: %s\n", result.Din, result.Version)
 	powerwall2 := powerwall_2.NewPowerwall2(client)
-	// gridSensor := grid.NewSensor(ip)
+	gridSensor := grid.NewSensor(client)
 
 	// Store the data in the "./db" directory.
 	fs := hap.NewFsStore("./db")
 
 	// Create the hap server.
-	server, err := hap.NewServer(fs, bridge.A, powerwall2.A) //, powerwall.A, gridSensor.A)
+	server, err := hap.NewServer(fs, bridge.A, powerwall2.A, gridSensor.A)
 	if err != nil {
 		// stop if an error happens
 		log.Panic(err)
