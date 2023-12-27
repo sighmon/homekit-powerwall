@@ -24,9 +24,14 @@ func NewSensor(client *powerwall.Client) *Sensor {
 	sensor.AddS(sensor.sensor.S)
 
 	sensor.sensor.ContactSensorState.SetValue(sensor.getSensorState())
-	// sensor.sensor.ContactSensorState.OnValueRemoteGet(sensor.getSensorState)
+	sensor.sensor.ContactSensorState.OnValueRemoteUpdate(sensor.updateSensorState)
 
 	return sensor
+}
+
+func (s *Sensor) updateSensorState(v int) {
+	currentSensorState := s.getSensorState()
+	s.sensor.ContactSensorState.SetValue(currentSensorState)
 }
 
 func (s *Sensor) getSensorState() int {

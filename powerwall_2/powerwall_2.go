@@ -32,15 +32,30 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.AddS(powerwall.battery.S)
 
 	powerwall.battery.BatteryLevel.SetValue(powerwall.getChargePercentage())
-	// powerwall.battery.BatteryLevel.OnValueRemoteUpdate(powerwall.getChargePercentage)
+	powerwall.battery.BatteryLevel.OnValueRemoteUpdate(powerwall.updateBatteryLevel)
 
 	powerwall.battery.ChargingState.SetValue(powerwall.getChargingState())
-	// powerwall.battery.ChargingState.OnValueRemoteUpdate(powerwall.getChargingState)
+	powerwall.battery.ChargingState.OnValueRemoteUpdate(powerwall.updateChargingState)
 
 	powerwall.battery.StatusLowBattery.SetValue(powerwall.getLowBatteryStatus())
-	// powerwall.battery.StatusLowBattery.OnValueRemoteUpdate(powerwall.getLowBatteryStatus)
+	powerwall.battery.StatusLowBattery.OnValueRemoteUpdate(powerwall.updateStatusLowBattery)
 
 	return powerwall
+}
+
+func (pw *Powerwall2) updateBatteryLevel(v int) {
+	currentCharge := pw.getChargePercentage()
+	pw.battery.BatteryLevel.SetValue(currentCharge)
+}
+
+func (pw *Powerwall2) updateChargingState(v int) {
+	currentChargeState := pw.getChargingState()
+	pw.battery.ChargingState.SetValue(currentChargeState)
+}
+
+func (pw *Powerwall2) updateStatusLowBattery(v int) {
+	currentLowBatteryState := pw.getLowBatteryStatus()
+	pw.battery.StatusLowBattery.SetValue(currentLowBatteryState)
 }
 
 func (pw *Powerwall2) getChargePercentage() int {
