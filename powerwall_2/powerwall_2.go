@@ -14,6 +14,7 @@ type Powerwall2 struct {
 	*accessory.A
 	battery *service.BatteryService
 	outlet  *service.Outlet
+	load    *service.LightSensor
 	client  *powerwall.Client
 }
 
@@ -32,8 +33,10 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.AddS(powerwall.battery.S)
 	powerwall.outlet = service.NewOutlet()
 	powerwall.AddS(powerwall.outlet.S)
+	powerwall.load = service.NewLightSensor()
+	powerwall.AddS(powerwall.load.S)
 
-	powerwall.battery.BatteryLevel.SetValue(powerwall.getChargePercentage())
+	powerwall.battery.BatteryLevel.SetValue(powerwall.GetChargePercentage())
 	powerwall.battery.BatteryLevel.OnValueRemoteUpdate(powerwall.updateBatteryLevel)
 
 	powerwall.battery.ChargingState.SetValue(powerwall.getChargingState())
@@ -50,11 +53,26 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.outlet.OutletInUse.SetValue(powerwall.getExporting())
 	powerwall.outlet.OutletInUse.OnValueRemoteUpdate(powerwall.updateOutletInUse)
 
+	// add light sensor for the current load measurement
+	powerwall.load.CurrentAmbientLightLevel.SetMinValue(0)
+	powerwall.load.CurrentAmbientLightLevel.SetMaxValue(10000)
+	powerwall.load.CurrentAmbientLightLevel.SetValue(powerwall.getCurrentLoad())
+	powerwall.load.CurrentAmbientLightLevel.OnValueRemoteUpdate(powerwall.updateCurrentLoad)
+
 	return powerwall
 }
 
+func (pw *Powerwall2) UpdateAll() {
+	pw.updateBatteryLevel(0)
+	pw.updateChargingState(0)
+	pw.updateStatusLowBattery(0)
+	pw.updateOutletOn(true)
+	pw.updateOutletInUse(true)
+	pw.updateCurrentLoad(0)
+}
+
 func (pw *Powerwall2) updateBatteryLevel(v int) {
-	currentCharge := pw.getChargePercentage()
+	currentCharge := pw.GetChargePercentage()
 	pw.battery.BatteryLevel.SetValue(currentCharge)
 }
 
@@ -68,10 +86,22 @@ func (pw *Powerwall2) updateStatusLowBattery(v int) {
 	pw.battery.StatusLowBattery.SetValue(currentLowBatteryState)
 }
 
-func (pw *Powerwall2) getChargePercentage() int {
+func (pw *Powerwall2) updateOutletOn(v bool) {
+	pw.outlet.On.SetValue(pw.getChargingOrExporting())
+}
+
+func (pw *Powerwall2) updateOutletInUse(v bool) {
+	pw.outlet.OutletInUse.SetValue(pw.getExporting())
+}
+
+func (pw *Powerwall2) updateCurrentLoad(v float64) {
+	pw.load.CurrentAmbientLightLevel.SetValue(pw.getCurrentLoad())
+}
+
+func (pw *Powerwall2) GetChargePercentage() int {
 	batteryStatus, err := pw.client.GetSOE()
 	if err != nil {
-		fmt.Printf("getChargePercentage error: %+v\n", err)
+		fmt.Printf("GetChargePercentage error: %+v\n", err)
 
 		return -1
 	}
@@ -111,14 +141,6 @@ func (pw *Powerwall2) getLowBatteryStatus() int {
 	return characteristic.StatusLowBatteryBatteryLevelNormal
 }
 
-func (pw *Powerwall2) updateOutletOn(v bool) {
-	pw.outlet.On.SetValue(pw.getChargingOrExporting())
-}
-
-func (pw *Powerwall2) updateOutletInUse(v bool) {
-	pw.outlet.OutletInUse.SetValue(pw.getExporting())
-}
-
 func (pw *Powerwall2) getChargingOrExporting() bool {
 	chargingStatus, err := pw.client.GetMetersAggregates()
 	if err != nil {
@@ -127,16 +149,19 @@ func (pw *Powerwall2) getChargingOrExporting() bool {
 	}
 
 	charge := pw.battery.BatteryLevel.Value()
+	batteryPower := (*chargingStatus)["battery"].InstantPower
 
-	if charge == 100 {
-		// battery is fully charged
-		return false
-	} else if (*chargingStatus)["battery"].InstantPower < 0 {
+	if batteryPower > 0 {
+		// battery is discharging
+		return true
+	} else if batteryPower < 0 {
 		// battery is charging
 		return true
+	} else if charge == 100 {
+		// battery is fully charged
+		return false
 	}
 
-	// battery is discharging
 	return true
 }
 
@@ -153,4 +178,14 @@ func (pw *Powerwall2) getExporting() bool {
 	}
 
 	return false
+}
+
+func (pw *Powerwall2) getCurrentLoad() float64 {
+	chargingStatus, err := pw.client.GetMetersAggregates()
+	if err != nil {
+		fmt.Printf("getCurrentLoad error: %+v\n", err)
+		return -1
+	}
+
+	return float64((*chargingStatus)["load"].InstantPower)
 }

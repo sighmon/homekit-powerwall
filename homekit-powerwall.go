@@ -101,6 +101,17 @@ func main() {
 		go startPrometheus()
 	}
 
+	// Update Powerwall readings every timeBetweenReadings
+	go func() {
+		for {
+			time.Sleep(time.Duration(timeBetweenReadings) * time.Second)
+			powerwall2.UpdateAll()
+			if prometheusExporter {
+				powerwallPrometheusExporter.UpdateReadings(float64(powerwall2.GetChargePercentage()))
+			}
+		}
+	}()
+
 	// Run the server.
 	server.ListenAndServe(ctx)
 }
