@@ -15,6 +15,7 @@ type Powerwall2 struct {
 	battery *service.BatteryService
 	outlet  *service.Outlet
 	load    *service.LightSensor
+	solar   *service.LightSensor
 	client  *powerwall.Client
 }
 
@@ -35,6 +36,8 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.AddS(powerwall.outlet.S)
 	powerwall.load = service.NewLightSensor()
 	powerwall.AddS(powerwall.load.S)
+	powerwall.solar = service.NewLightSensor()
+	powerwall.AddS(powerwall.solar.S)
 
 	powerwall.battery.BatteryLevel.SetValue(powerwall.GetChargePercentage())
 	powerwall.battery.BatteryLevel.OnValueRemoteUpdate(powerwall.updateBatteryLevel)
@@ -56,8 +59,14 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	// add light sensor for the current load measurement
 	powerwall.load.CurrentAmbientLightLevel.SetMinValue(0)
 	powerwall.load.CurrentAmbientLightLevel.SetMaxValue(10000)
-	powerwall.load.CurrentAmbientLightLevel.SetValue(powerwall.getCurrentLoad())
+	powerwall.load.CurrentAmbientLightLevel.SetValue(powerwall.GetCurrentLoad())
 	powerwall.load.CurrentAmbientLightLevel.OnValueRemoteUpdate(powerwall.updateCurrentLoad)
+
+	// add light sensor for the current solar measurement
+	powerwall.load.CurrentAmbientLightLevel.SetMinValue(0)
+	powerwall.load.CurrentAmbientLightLevel.SetMaxValue(10000)
+	powerwall.solar.CurrentAmbientLightLevel.SetValue(powerwall.GetCurrentSolar())
+	powerwall.solar.CurrentAmbientLightLevel.OnValueRemoteUpdate(powerwall.updateCurrentSolar)
 
 	return powerwall
 }
@@ -95,7 +104,11 @@ func (pw *Powerwall2) updateOutletInUse(v bool) {
 }
 
 func (pw *Powerwall2) updateCurrentLoad(v float64) {
-	pw.load.CurrentAmbientLightLevel.SetValue(pw.getCurrentLoad())
+	pw.load.CurrentAmbientLightLevel.SetValue(pw.GetCurrentLoad())
+}
+
+func (pw *Powerwall2) updateCurrentSolar(v float64) {
+	pw.solar.CurrentAmbientLightLevel.SetValue(pw.GetCurrentSolar())
 }
 
 func (pw *Powerwall2) GetChargePercentage() int {
@@ -180,12 +193,22 @@ func (pw *Powerwall2) getExporting() bool {
 	return false
 }
 
-func (pw *Powerwall2) getCurrentLoad() float64 {
+func (pw *Powerwall2) GetCurrentLoad() float64 {
 	chargingStatus, err := pw.client.GetMetersAggregates()
 	if err != nil {
-		fmt.Printf("getCurrentLoad error: %+v\n", err)
+		fmt.Printf("GetCurrentLoad error: %+v\n", err)
 		return -1
 	}
 
 	return float64((*chargingStatus)["load"].InstantPower)
+}
+
+func (pw *Powerwall2) GetCurrentSolar() float64 {
+	chargingStatus, err := pw.client.GetMetersAggregates()
+	if err != nil {
+		fmt.Printf("GetCurrentSolar error: %+v\n", err)
+		return -1
+	}
+
+	return float64((*chargingStatus)["solar"].InstantPower)
 }

@@ -33,13 +33,13 @@ func init() {
 	flag.StringVar(&powerwallIP, "ip", inputDefault, "IP address of Powerwall")
 	flag.StringVar(&username, "username", inputDefault, "Username setup on your Powerwall")
 	flag.StringVar(&password, "password", inputDefault, "Password setup on your Powerwall")
-	flag.BoolVar(&prometheusExporter, "prometheusExporter", false, "Start a Prometheus exporter on port 8000")
+	flag.BoolVar(&prometheusExporter, "prometheusExporter", false, "Start a Prometheus exporter on port 8001")
 	flag.IntVar(&timeBetweenReadings, "timeBetweenReadings", 30, "The time in seconds between Powerwall readings")
 	flag.Parse()
 }
 
 func startPrometheus() {
-	powerwallPrometheusExporter = promexporter.New(":8000")
+	powerwallPrometheusExporter = promexporter.New(":8001")
 	powerwallPrometheusExporter.Start()
 }
 
@@ -107,7 +107,11 @@ func main() {
 			time.Sleep(time.Duration(timeBetweenReadings) * time.Second)
 			powerwall2.UpdateAll()
 			if prometheusExporter {
-				powerwallPrometheusExporter.UpdateReadings(float64(powerwall2.GetChargePercentage()))
+				powerwallPrometheusExporter.UpdateReadings(
+					float64(powerwall2.GetChargePercentage()),
+					float64(powerwall2.GetCurrentLoad()),
+					float64(powerwall2.GetCurrentSolar()),
+				)
 			}
 		}
 	}()
