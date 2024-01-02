@@ -108,9 +108,9 @@ func main() {
 			powerwall2.UpdateAll()
 			if prometheusExporter {
 				powerwallPrometheusExporter.UpdateReadings(
-					float64(powerwall2.GetChargePercentage()),
-					float64(powerwall2.GetCurrentLoad()),
-					float64(powerwall2.GetCurrentSolar()),
+					float64(powerwall2.Battery.BatteryLevel.Value()),
+					float64(powerwall2.Load.CurrentAmbientLightLevel.Value()),
+					float64(powerwall2.Solar.CurrentAmbientLightLevel.Value()),
 				)
 			}
 		}

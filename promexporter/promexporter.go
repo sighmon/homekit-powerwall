@@ -22,13 +22,13 @@ var (
 	loadGauge = promauto.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "load",
-			Help: "Kilowatt (kW)",
+			Help: "Watt (W)",
 		},
 	)
 	solarGauge = promauto.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "solar",
-			Help: "Kilowatt (kW)",
+			Help: "Watt (W)",
 		},
 	)
 
