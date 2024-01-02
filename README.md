@@ -4,7 +4,7 @@ An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_
 
 <img src="images/homekit-powerwall-macos.png" width="100%" />
 
-<img src="images/homekit-powerwall-ios-1.jpg" width="25%" /><img src="images/homekit-powerwall-ios-2.jpg" width="25%" /><img src="images/homekit-powerwall-ios-3.jpg" width="25%" /><img src="images/homekit-powerwall-ios-4.jpg" width="25%" />
+<img src="images/homekit-powerwall-ios-1.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-2.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-3.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-4.jpg" width="22%" style="margin-right: 2px;" />
 
 ## Software
 
@@ -15,7 +15,9 @@ An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_
 
 ### Prometheus exporter
 
-To export the `battery` for [Prometheus](https://prometheus.io) use the optional flag `-prometheusExporter`.
+To export the `battery`, `load`, and `solar` for [Prometheus](https://prometheus.io) use the optional flag `-prometheusExporter`.
+
+<img src="images/homekit-powerwall-prometheus-grafana.png" width="100%" />
 
 * Run: `go run homekit-powerwall.go -ip POWERWALL_IP -username YOUR_USERNAME -password YOUR_PASSWORD -prometheusExporter`
 
