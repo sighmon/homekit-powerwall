@@ -106,6 +106,7 @@ func main() {
 		for {
 			time.Sleep(time.Duration(timeBetweenReadings) * time.Second)
 			powerwall2.UpdateAll()
+			gridSensor.UpdateSensorState(0)
 			if prometheusExporter {
 				powerwallPrometheusExporter.UpdateReadings(
 					float64(powerwall2.Battery.BatteryLevel.Value()),

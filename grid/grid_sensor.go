@@ -11,7 +11,7 @@ import (
 
 type Sensor struct {
 	*accessory.A
-	sensor *service.ContactSensor
+	Sensor *service.ContactSensor
 	client *powerwall.Client
 }
 
@@ -20,18 +20,18 @@ func NewSensor(client *powerwall.Client) *Sensor {
 
 	sensor := &Sensor{client: client}
 	sensor.A = accessory.New(info, accessory.TypeSensor)
-	sensor.sensor = service.NewContactSensor()
-	sensor.AddS(sensor.sensor.S)
+	sensor.Sensor = service.NewContactSensor()
+	sensor.AddS(sensor.Sensor.S)
 
-	sensor.sensor.ContactSensorState.SetValue(sensor.getSensorState())
-	sensor.sensor.ContactSensorState.OnValueRemoteUpdate(sensor.updateSensorState)
+	sensor.Sensor.ContactSensorState.SetValue(sensor.getSensorState())
+	sensor.Sensor.ContactSensorState.OnValueRemoteUpdate(sensor.UpdateSensorState)
 
 	return sensor
 }
 
-func (s *Sensor) updateSensorState(v int) {
+func (s *Sensor) UpdateSensorState(v int) {
 	currentSensorState := s.getSensorState()
-	s.sensor.ContactSensorState.SetValue(currentSensorState)
+	s.Sensor.ContactSensorState.SetValue(currentSensorState)
 }
 
 func (s *Sensor) getSensorState() int {

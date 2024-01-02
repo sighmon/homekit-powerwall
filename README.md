@@ -2,7 +2,9 @@
 
 An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_au/powerwall).
 
-<img src="homekit-powerwall.png" width="100%" />
+<img src="images/homekit-powerwall-macos.png" width="100%" />
+
+<img src="images/homekit-powerwall-ios-1.jpg" width="25%" /><img src="images/homekit-powerwall-ios-2.jpg" width="25%" /><img src="images/homekit-powerwall-ios-3.jpg" width="25%" /><img src="images/homekit-powerwall-ios-4.jpg" width="25%" />
 
 ## Software
 
@@ -22,7 +24,15 @@ You'll then see the data on port `8001`: http://localhost:8001/metrics
 ```
 # HELP battery Charge (%)
 # TYPE battery gauge
-battery 64
+battery 90
+
+# HELP load Watt (W)
+# TYPE load gauge
+load 3980
+
+# HELP solar Watt (W)
+# TYPE solar gauge
+solar 6230
 ```
 
 ## Powerwall setup
