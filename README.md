@@ -4,7 +4,7 @@ An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_
 
 <img src="images/homekit-powerwall-macos.png" width="100%" />
 
-<p><img src="images/homekit-powerwall-ios-1.jpg" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-2.jpg" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-3.jpg" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-4.jpg" /></p>
+<p><img src="images/homekit-powerwall-ios-1.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-2.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-3.jpg" width="22%" style="margin-right: 2px;" /><img src="images/homekit-powerwall-ios-4.jpg" width="22%" style="margin-right: 2px;" /></p>
 
 ## Software
 
