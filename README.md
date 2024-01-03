@@ -10,6 +10,7 @@ An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_
 
 * Install [Go](http://golang.org/doc/install) >= 1.14 ([useful Gist](https://gist.github.com/pcgeek86/0206d688e6760fe4504ba405024e887c) for Raspberry Pi)
 * Build: `go build homekit-powerwall.go`
+* Build for Raspberry Pi by cross-compiling on macOS: `env GOOS=linux GOARCH=arm GOARM=7 go build homekit-powerwall.go`
 * Run: `go run homekit-powerwall.go -ip POWERWALL_IP -username YOUR_USERNAME -password YOUR_PASSWORD`
 * In iOS Home app, click Add Accessory -> "More options..." and you should see "Tesla"
 
@@ -51,4 +52,5 @@ Then use these credentials to run this HomeKit exporter app.
 ## TODO
 
 - [x] Update to use `hap` instead of `hc
+- [ ] Add energy exported/imported from [meters](https://github.com/foogod/go-powerwall/blob/main/meters.go)
 - [ ] Add pull-request to the original repository

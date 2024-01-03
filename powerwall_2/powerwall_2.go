@@ -135,7 +135,7 @@ func (pw *Powerwall2) getChargingState() int {
 
 	if charge == 100 {
 		// battery is fully charged
-		return characteristic.ChargingStateNotChargeable
+		return characteristic.ChargingStateNotCharging
 	} else if (*pw.meters)["battery"].InstantPower < 0 {
 		// battery is charging
 		return characteristic.ChargingStateCharging
