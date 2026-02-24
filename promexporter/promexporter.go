@@ -31,6 +31,12 @@ var (
 			Help: "Watt (W)",
 		},
 	)
+	gridGauge = promauto.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "grid",
+			Help: "Watt (W)",
+		},
+	)
 
 	index = template.Must(template.New("index").Parse(
 		`<!doctype html>
@@ -62,8 +68,9 @@ func (e *Exporter) Start() {
 	}
 }
 
-func (e *Exporter) UpdateReadings(battery float64, load float64, solar float64) {
+func (e *Exporter) UpdateReadings(battery float64, load float64, solar float64, grid float64) {
 	batteryGauge.Set(battery)
 	loadGauge.Set(load)
 	solarGauge.Set(solar)
+	gridGauge.Set(grid)
 }

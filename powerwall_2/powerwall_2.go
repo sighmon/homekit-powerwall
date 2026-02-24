@@ -16,6 +16,7 @@ type Powerwall2 struct {
 	Outlet      *service.Outlet
 	Load        *service.LightSensor
 	Solar       *service.LightSensor
+	Grid        *service.LightSensor
 	client      *powerwall.Client
 	meters      *map[string]powerwall.MeterAggregatesData
 	metersError error
@@ -40,6 +41,8 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.AddS(powerwall.Load.S)
 	powerwall.Solar = service.NewLightSensor()
 	powerwall.AddS(powerwall.Solar.S)
+	powerwall.Grid = service.NewLightSensor()
+	powerwall.AddS(powerwall.Grid.S)
 
 	powerwall.Battery.BatteryLevel.SetValue(powerwall.getChargePercentage())
 	powerwall.Battery.BatteryLevel.OnValueRemoteUpdate(powerwall.updateBatteryLevel)
@@ -68,6 +71,12 @@ func NewPowerwall2(client *powerwall.Client) *Powerwall2 {
 	powerwall.Solar.CurrentAmbientLightLevel.SetValue(powerwall.getCurrentSolar())
 	powerwall.Solar.CurrentAmbientLightLevel.OnValueRemoteUpdate(powerwall.updateCurrentSolar)
 
+	// add light sensor for the current grid measurement
+	powerwall.Grid.CurrentAmbientLightLevel.SetMinValue(0)
+	powerwall.Grid.CurrentAmbientLightLevel.SetMaxValue(10000)
+	powerwall.Grid.CurrentAmbientLightLevel.SetValue(powerwall.getCurrentGrid())
+	powerwall.Grid.CurrentAmbientLightLevel.OnValueRemoteUpdate(powerwall.updateCurrentGrid)
+
 	return powerwall
 }
 
@@ -79,6 +88,7 @@ func (pw *Powerwall2) UpdateAll() {
 	pw.updateOutletInUse(true)
 	pw.updateCurrentLoad(0)
 	pw.updateCurrentSolar(0)
+	pw.updateCurrentGrid(0)
 }
 
 func (pw *Powerwall2) updateBatteryLevel(v int) {
@@ -110,6 +120,10 @@ func (pw *Powerwall2) updateCurrentLoad(v float64) {
 
 func (pw *Powerwall2) updateCurrentSolar(v float64) {
 	pw.Solar.CurrentAmbientLightLevel.SetValue(pw.getCurrentSolar())
+}
+
+func (pw *Powerwall2) updateCurrentGrid(v float64) {
+	pw.Grid.CurrentAmbientLightLevel.SetValue(pw.getCurrentGrid())
 }
 
 func (pw *Powerwall2) getChargePercentage() int {
@@ -194,4 +208,18 @@ func (pw *Powerwall2) getCurrentSolar() float64 {
 	}
 
 	return float64((*pw.meters)["solar"].InstantPower)
+}
+
+func (pw *Powerwall2) getCurrentGrid() float64 {
+	// HomeKit light level must be non-negative, so expose grid power magnitude.
+	return math.Abs(pw.GetCurrentGridPower())
+}
+
+func (pw *Powerwall2) GetCurrentGridPower() float64 {
+	if pw.metersError != nil {
+		fmt.Printf("GetCurrentGridPower error: %+v\n", pw.metersError)
+		return -1
+	}
+
+	return float64((*pw.meters)["site"].InstantPower)
 }
