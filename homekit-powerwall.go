@@ -112,6 +112,7 @@ func main() {
 					float64(powerwall2.Battery.BatteryLevel.Value()),
 					float64(powerwall2.Load.CurrentAmbientLightLevel.Value()),
 					float64(powerwall2.Solar.CurrentAmbientLightLevel.Value()),
+					powerwall2.GetCurrentGridPower(),
 				)
 			}
 		}

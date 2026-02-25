@@ -16,7 +16,7 @@ An Apple HomeKit accessory for the [Tesla Powerwall 2](https://www.tesla.com/en_
 
 ### Prometheus exporter
 
-To export the `battery`, `load`, and `solar` for [Prometheus](https://prometheus.io) use the optional flag `-prometheusExporter`.
+To export the `battery`, `load`, `solar`, and `grid` for [Prometheus](https://prometheus.io) use the optional flag `-prometheusExporter`.
 
 <img src="images/homekit-powerwall-prometheus-grafana.png" width="100%" />
 
@@ -36,6 +36,10 @@ load 3980
 # HELP solar Watt (W)
 # TYPE solar gauge
 solar 6230
+
+# HELP grid Watt (W, signed: negative when exporting)
+# TYPE grid gauge
+grid -1200
 ```
 
 ## Powerwall setup
